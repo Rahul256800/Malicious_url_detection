@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malicious URL Detection</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+        :root {
+            --main-color: #06c;
+            --accent-color: #006;
+            --c1: #5E5B52;
+            --c2: #8F3000;
+            --c3: #F55200;
+            --c4: #DCC48E;
+            --c5: #EAD2AC;
+        }
+
+        html, body {
+            height: 100%;
+            background: linear-gradient(var(--c1), var(--c4));
+            background-size: cover;
+        }
+
+        input {
+            padding: 10px;
+            border: 2px solid var(--c3);
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--c3);
+            border: none;
+            color: #fff;
+            transition: 0.5s linear;
+            font-size: 1em;
+        }
+
+        button:hover {
+            color: #000;
+            font-weight: bold;
+            transition: 0.5s linear;
+            cursor: pointer;
+        }
+
+        #p1 {
+            color: var(--c3);
+            font-size: 50px;
+            margin-bottom: 30px;
+        }
+
+        .spinner-border {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <p class='b' id='p1'>Malicious URL Detection</p>
+        <h1 class='b'>Welcome to our Project Page</h1>
+        <p>This webpage will let you test a URL using our trained Phishing Detection Machine Learning model.</p>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <input type="text" id="urlInput" class="form-control" placeholder="Enter a URL">
+                <button onclick="checkURL()" class="btn btn-block">Search</button>
+                <div class="spinner-border text-warning" role="status" id="loadingSpinner">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p id="result" class="mt-3"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        async function checkURL() {
+            const url = document.getElementById('urlInput').value;
+            const resultElement = document.getElementById('result');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            // Clear previous result and show loading spinner
+            resultElement.innerText = '';
+            loadingSpinner.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/check-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                resultElement.innerText = The URL is ${result.is_anomalous ? 'anomalous' : 'normal'} because: ${result.reason};
+            } catch (error) {
+                resultElement.innerText = 'There was an error checking the URL. Please try again.';
+            } finally {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
